@@ -74,7 +74,31 @@ export default function FlowyAIFriend({ tasks, userName }: FlowyAIFriendProps) {
         .join("\n");
 
       const prompt = `${systemPrompt}\n\nConversation so far:\n${chatContext}\n\nRespond as Flowy now.`;
-      const textResponse = await generateGeminiTextFromBrowser(prompt);
+      let textResponse: string;
+      try {
+        textResponse = await generateGeminiTextFromBrowser(prompt);
+      } catch (browserErr) {
+        const response = await fetch("/api/coach", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [
+              { sender: "user", text: `[SYSTEM INSTRUCTION] ${systemPrompt}` },
+              ...messages.filter(m => m.id !== "welcome"),
+              userMsg
+            ],
+            currentTasks: tasks
+          })
+        });
+
+        if (!response.ok) {
+          const reason = browserErr instanceof Error ? browserErr.message : "Unknown Gemini error";
+          throw new Error(reason);
+        }
+
+        const data = await response.json();
+        textResponse = data.text || "";
+      }
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: "ai",
@@ -88,7 +112,7 @@ export default function FlowyAIFriend({ tasks, userName }: FlowyAIFriendProps) {
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: "ai",
-        text: "Oh no! My signal is fading a bit. Set GEMINI_API_KEY in frontend env so we can keep talking! 💖",
+        text: `Oh no! My signal is fading a bit. ${err instanceof Error ? err.message : "Please try again in a moment."} 💖`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, aiMsg]);

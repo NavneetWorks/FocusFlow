@@ -59,7 +59,28 @@ export default function AICoach({ tasks }: AICoachProps) {
         .join("\n");
 
       const prompt = `You are FocusFlow AI Productivity Coach.\nKeep responses practical, warm, and concise.\nUse markdown bullets when helpful.\n\nCurrent task list:\n${taskContext || "No tasks yet."}\n\nConversation:\n${chatContext}\n\nNow respond to the latest user message with actionable coaching.`;
-      const text = await generateGeminiTextFromBrowser(prompt);
+      let text: string;
+      try {
+        text = await generateGeminiTextFromBrowser(prompt);
+      } catch (browserErr) {
+        // Keep app usable when direct browser Gemini is rate-limited or temporarily unavailable.
+        const response = await fetch("/api/coach", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: [...messages, userMsg],
+            currentTasks: tasks.map(t => ({ title: t.title, deadline: t.deadline, priority: t.priority, status: t.status }))
+          })
+        });
+
+        if (!response.ok) {
+          const reason = browserErr instanceof Error ? browserErr.message : "Unknown Gemini error";
+          throw new Error(reason);
+        }
+
+        const data = await response.json();
+        text = data.text || "";
+      }
       
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
@@ -74,7 +95,7 @@ export default function AICoach({ tasks }: AICoachProps) {
       const errorMsg: ChatMessage = {
         id: `err-${Date.now()}`,
         sender: "ai",
-        text: "🚨 SYNAPSE OFFLINE: I couldn't connect to Gemini. Set GEMINI_API_KEY in your frontend environment and redeploy.",
+        text: `🚨 SYNAPSE OFFLINE: ${error instanceof Error ? error.message : "I couldn't reach Gemini right now. Please retry in a moment."}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMsg]);
