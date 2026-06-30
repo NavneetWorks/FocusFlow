@@ -1,0 +1,182 @@
+{
+  "entities": {
+    "SharedCommitment": {
+      "title": "Shared Commitment",
+      "description": "A snapshot of user's commitments and accomplishments for a specific day, shareable with friends for accountability",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "userProfilePic": { "type": "string" },
+        "date": { "type": "string" },
+        "progressPercentage": { "type": "number" },
+        "motivationalNote": { "type": "string" },
+        "lastUpdated": { "type": "string" },
+        "goals": { "type": "array" },
+        "tasks": { "type": "array" },
+        "habits": { "type": "array" },
+        "reactions": { "type": "object" },
+        "comments": { "type": "array" }
+      },
+      "required": ["id", "userId", "date", "progressPercentage"]
+    },
+    "CommitmentGroup": {
+      "title": "Commitment Group",
+      "description": "A collaborative workspace where friends work together on shared study or challenge targets",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "inviteCode": { "type": "string" },
+        "creatorId": { "type": "string" },
+        "creatorEmail": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "members": { "type": "array" },
+        "admins": { "type": "array" },
+        "memberInfo": { "type": "object" }
+      },
+      "required": ["id", "name", "inviteCode", "creatorId", "members"]
+    },
+    "GroupTask": {
+      "title": "Group Task",
+      "description": "A task assigned to members within a collaborative group",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "groupId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "assignedTo": { "type": "array" },
+        "deadline": { "type": "string" },
+        "priority": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string" },
+        "progress": { "type": "number" },
+        "attachments": { "type": "array" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "completedAt": { "type": "string" }
+      },
+      "required": ["id", "groupId", "title", "status"]
+    },
+    "GroupActivity": {
+      "title": "Group Activity",
+      "description": "Audit trail log tracking status changes and updates in the group",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "groupId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userProfilePic": { "type": "string" },
+        "action": { "type": "string" },
+        "details": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "groupId", "userId", "action", "timestamp"]
+    },
+    "GroupMessage": {
+      "title": "Group Message",
+      "description": "Task-specific comment or message in discussion thread",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "taskId": { "type": "string" },
+        "groupId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderProfilePic": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "attachments": { "type": "array" }
+      },
+      "required": ["id", "taskId", "groupId", "senderId", "text", "createdAt"]
+    },
+    "UserFeedback": {
+      "title": "User Feedback",
+      "description": "User submitted feedback about features and general experience",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "feedbackText": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "sentiment": { "type": "string" },
+        "category": { "type": "string" },
+        "acknowledgment": { "type": "string" }
+      },
+      "required": ["id", "userId", "feedbackText", "timestamp"]
+    },
+    "ProblemReport": {
+      "title": "Problem Report",
+      "description": "User reported system problems and bugs with dynamic mitigations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "problemDescription": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "riskLevel": { "type": "string" },
+        "affectedComponent": { "type": "string" },
+        "mitigationSteps": { "type": "array" },
+        "acknowledgment": { "type": "string" }
+      },
+      "required": ["id", "userId", "problemDescription", "timestamp"]
+    },
+    "SentEncouragement": {
+      "title": "Sent Encouragement",
+      "description": "A record of an encouragement message sent by a user to another user, tracked for accountability history",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "commitmentId": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "senderId", "recipientId", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "commitments/{commitmentId}": {
+      "schema": "SharedCommitment",
+      "description": "Publicly or privately shared daily commitments with viewer comments and reactions"
+    },
+    "sentEncouragements/{encouragementId}": {
+      "schema": "SentEncouragement",
+      "description": "Historical log of encouragement messages sent by users to track their outbound social accountability support"
+    },
+    "groups/{groupId}": {
+      "schema": "CommitmentGroup",
+      "description": "Group metadata, member list, and gamified member statuses"
+    },
+    "groups/{groupId}/tasks/{taskId}": {
+      "schema": "GroupTask",
+      "description": "Tasks created for specific members of a collaborative workspace group"
+    },
+    "groups/{groupId}/activities/{activityId}": {
+      "schema": "GroupActivity",
+      "description": "Audit trail logs detailing real-time updates within a group"
+    },
+    "groups/{groupId}/tasks/{taskId}/messages/{messageId}": {
+      "schema": "GroupMessage",
+      "description": "Discussions and attachments uploaded relative to individual tasks"
+    },
+    "feedback/{feedbackId}": {
+      "schema": "UserFeedback",
+      "description": "Feedback suggestions and warm messages sent by users"
+    },
+    "reports/{reportId}": {
+      "schema": "ProblemReport",
+      "description": "Bug and layout problems reported with QA analysis and mitigations"
+    }
+  }
+}

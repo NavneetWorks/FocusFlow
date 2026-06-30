@@ -7,37 +7,42 @@
 }
 
 body {
-  --bg-app: #050507;
-  --text-app: #f8fafc;
-  --bg-card: rgba(255, 255, 255, 0.04);
-  --border-card: rgba(255, 255, 255, 0.08);
-  --text-muted: rgba(255, 255, 255, 0.4);
-  --bg-sidebar: rgba(5, 5, 7, 0.9);
+  --bg-app: #030712; /* Rich dark cosmic slate background */
+  --text-app: #f3f4f6; /* Off-white highly readable primary text */
+  --bg-card: rgba(17, 24, 39, 0.6); /* Translucent obsidian background */
+  --border-card: rgba(255, 255, 255, 0.06); /* Sophisticated dual border */
+  --text-muted: rgba(156, 163, 175, 0.85); /* Highly legible midtone gray */
+  --bg-sidebar: #0b0f19;
   --border-sidebar: rgba(255, 255, 255, 0.05);
-  --bg-input: rgba(255, 255, 255, 0.05);
-  --border-input: rgba(255, 255, 255, 0.1);
+  --bg-input: rgba(3, 7, 18, 0.7);
+  --border-input: rgba(255, 255, 255, 0.08);
+  --accent-color: #6366f1; /* Premium deep indigo */
+  --accent-glowing: rgba(99, 102, 241, 0.15);
 
   background-color: var(--bg-app);
   color: var(--text-app);
   font-family: var(--font-sans);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: -0.011em;
 }
 
 body.light {
-  --bg-app: #f1f5f9;
-  --text-app: #0f172a;
-  --bg-card: #ffffff;
-  --border-card: rgba(15, 23, 42, 0.08);
-  --text-muted: rgba(15, 23, 42, 0.6);
+  --bg-app: #f8fafc; /* Crisp, luxurious Nordic white/slate */
+  --text-app: #0f172a; /* Sophisticated deep slate dark text */
+  --bg-card: #ffffff; /* pure white solid card layout */
+  --border-card: rgba(15, 23, 42, 0.06); /* ultra-thin elegant border */
+  --text-muted: #475569; /* soft charcoal text for body and labels */
   --bg-sidebar: #ffffff;
-  --border-sidebar: rgba(15, 23, 42, 0.08);
-  --bg-input: #f8fafc;
-  --border-input: rgba(15, 23, 42, 0.12);
+  --border-sidebar: rgba(15, 23, 42, 0.06);
+  --bg-input: #f1f5f9;
+  --border-input: rgba(15, 23, 42, 0.08);
+  --accent-color: #4f46e5;
+  --accent-glowing: rgba(79, 70, 229, 0.08);
 }
 
-/* Light mode overrides to inject theme color changes automatically */
-body.light, 
-body.light div:not(.bg-indigo-600):not(.bg-rose-500):not(.bg-emerald-600):not(.bg-pink-600) {
+/* Light mode structural element styling overrides */
+body.light,
+body.light div:not(.bg-indigo-600):not(.bg-rose-500):not(.bg-emerald-600):not(.bg-pink-600):not(.bg-indigo-500):not(.text-indigo-400):not(.text-emerald-400):not(.text-rose-400) {
   color: var(--text-app);
 }
 
@@ -50,7 +55,7 @@ body.light aside {
   background-color: var(--bg-app) !important;
 }
 
-body.light .bg-slate-900\/40, 
+body.light .bg-slate-900\/40,
 body.light .bg-slate-900\/60,
 body.light .bg-slate-950\/40,
 body.light .bg-slate-950\/20,
@@ -59,7 +64,10 @@ body.light .bg-indigo-500\/10,
 body.light .bg-indigo-950\/10,
 body.light .bg-pink-950\/5,
 body.light .bg-slate-950\/30,
-body.light .bg-rose-950\/20 {
+body.light .bg-rose-950\/20,
+body.light .bg-rose-950\/30,
+body.light .bg-black\/20,
+body.light .bg-black\/40 {
   background-color: var(--bg-card) !important;
 }
 
@@ -69,10 +77,12 @@ body.light .border-slate-800,
 body.light .border-slate-850,
 body.light .border-indigo-500\/20,
 body.light .border-indigo-500\/25,
+body.light .border-indigo-500\/30,
 body.light .border-indigo-500\/40,
 body.light .border-pink-500\/30,
 body.light .border-slate-900,
 body.light .border-rose-500\/20,
+body.light .border-rose-500\/30,
 body.light .border-slate-800\/60,
 body.light .border-slate-850\/80 {
   border-color: var(--border-card) !important;
@@ -103,26 +113,63 @@ body.light select {
 body.light .text-white\/30,
 body.light .text-white\/40,
 body.light .text-slate-600 {
-  color: rgba(15, 23, 42, 0.35) !important;
+  color: rgba(15, 23, 42, 0.45) !important;
 }
 
 body.light .shadow-2xl,
 body.light .shadow-xl {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03) !important;
+}
+
+/* Custom premium styles */
+.premium-gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.light .premium-gradient-text {
+  background: linear-gradient(135deg, #0f172a 0%, #4338ca 60%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.premium-card-glow {
+  position: relative;
+}
+.premium-card-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 25px var(--accent-glowing);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.premium-card-glow:hover::after {
+  opacity: 1;
 }
 
 /* Custom scrollbar to keep layout clean and minimal */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(156, 163, 175, 0.15);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(156, 163, 175, 0.3);
+}
+
+body.light ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.08);
+}
+body.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.15);
 }

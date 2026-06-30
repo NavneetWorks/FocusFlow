@@ -1,20 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-  Bookmark, 
-  FileText, 
-  Image as ImageIcon, 
-  Video as VideoIcon, 
-  File as FileIcon, 
-  Trash2, 
-  Edit3, 
-  Plus, 
-  Search, 
-  Bell, 
-  Calendar, 
-  Sparkles, 
-  Clock, 
-  X, 
-  Upload, 
+import {
+  Bookmark,
+  FileText,
+  Image as ImageIcon,
+  Video as VideoIcon,
+  File as FileIcon,
+  Trash2,
+  Edit3,
+  Plus,
+  Search,
+  Bell,
+  Calendar,
+  Sparkles,
+  Clock,
+  X,
+  Upload,
   AlertCircle,
   FolderHeart,
   ExternalLink,
@@ -45,7 +45,7 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTypeFilter, setSelectedTypeFilter] = useState<string>("all");
   const [selectedPriorityFilter, setSelectedPriorityFilter] = useState<string>("all");
-  
+
   // Form states
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -58,12 +58,12 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
   const [fileName, setFileName] = useState("");
   const [dragActive, setDragActive] = useState(false);
   const [viewingItem, setViewingItem] = useState<RememberMeItem | null>(null);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter items
   const filteredItems = items.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           item.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           (item.fileName && item.fileName.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesType = selectedTypeFilter === "all" || item.type === selectedTypeFilter;
@@ -169,7 +169,7 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
   const getProactiveReminders = () => {
     const reminders = [];
     const urgentItems = items.filter(i => i.priority === "Very Important" || i.priority === "Important");
-    
+
     // Sort reminders with upcoming dates
     const itemsWithReminders = items
       .filter(i => i.reminderTime && new Date(i.reminderTime) > new Date())
@@ -214,20 +214,20 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
 
   return (
     <div className="space-y-6" id="remember-me-workspace">
-      
+
       {/* Upper Bento-Style Header with AI Companion banner */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-8 bg-slate-900/40 border border-white/5 p-6 rounded-3xl flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-slate-900/40 border border-white/5 p-6 rounded-3xl flex flex-col justify-between premium-card-glow shadow-lg">
           <div className="space-y-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 flex items-center gap-1">
+            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-              Proactive Knowledge Locker
+              Knowledge Cache & Critical Context Locker
             </span>
-            <h1 className="text-2xl font-black text-white tracking-tight uppercase">
-              Remember Me Hub
+            <h1 className="text-2xl font-black text-white tracking-tight uppercase premium-gradient-text">
+              Executive Core Vault
             </h1>
             <p className="text-xs text-white/50 leading-relaxed max-w-xl">
-              Keep critical documents, dynamic reminders, project codes, media uploads, and mental reminders in one unified spot. Our proactive assistant highlights saved items based on urgency so you never lose key details.
+              Secure critical reference assets, dynamic documentation, project dependencies, media uploads, and vital notes in a single high-availability ledger. Our proactive AI scanner surfaces high-importance entries contextually so key details are never forgotten.
             </p>
           </div>
 
@@ -237,17 +237,17 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
               className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all shadow-lg shadow-indigo-600/10 flex items-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Store New Item</span>
+              <span>Vault New Asset</span>
             </button>
           </div>
         </div>
 
         {/* AI Reminders Panel */}
-        <div className="lg:col-span-4 bg-slate-900/60 border border-white/5 p-6 rounded-3xl flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-slate-900/60 border border-white/5 p-6 rounded-3xl flex flex-col justify-between premium-card-glow shadow-lg">
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-white/5 pb-2">
               <Bell className="w-4 h-4 text-pink-400 animate-bounce" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Proactive Assistant Dispatcher</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-white/80">Proactive Context Assistant</span>
             </div>
 
             <div className="space-y-3 max-h-[140px] overflow-y-auto">
@@ -365,7 +365,7 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
 
                 {/* Media Visualization block */}
                 {item.mediaUrl && (
-                  <div 
+                  <div
                     onClick={() => setViewingItem(item)}
                     className="bg-black/40 border border-white/5 rounded-xl overflow-hidden aspect-video relative group/media cursor-pointer hover:border-indigo-500/30 transition-all"
                   >
@@ -378,16 +378,16 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
                     </div>
 
                     {item.type === "image" && (
-                      <img 
-                        src={item.mediaUrl} 
-                        alt={item.title} 
+                      <img
+                        src={item.mediaUrl}
+                        alt={item.title}
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover group-hover/media:scale-105 transition-transform duration-500"
                       />
                     )}
                     {item.type === "video" && (
-                      <video 
-                        src={item.mediaUrl} 
+                      <video
+                        src={item.mediaUrl}
                         className="w-full h-full object-cover"
                       />
                     )}
@@ -508,9 +508,9 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
                 <div className="bg-black/60 border border-white/5 rounded-2xl overflow-hidden relative">
                   {viewingItem.type === "image" && (
                     <div className="flex flex-col items-center">
-                      <img 
-                        src={viewingItem.mediaUrl} 
-                        alt={viewingItem.title} 
+                      <img
+                        src={viewingItem.mediaUrl}
+                        alt={viewingItem.title}
                         referrerPolicy="no-referrer"
                         className="max-h-[350px] w-auto object-contain mx-auto rounded-xl shadow-lg"
                       />
@@ -518,10 +518,10 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
                         <span className="text-[10px] text-white/50 font-bold uppercase truncate max-w-[70%]">
                           {viewingItem.fileName || "Viewable Image Attachment"}
                         </span>
-                        <a 
-                          href={viewingItem.mediaUrl} 
-                          target="_blank" 
-                          rel="noreferrer" 
+                        <a
+                          href={viewingItem.mediaUrl}
+                          target="_blank"
+                          rel="noreferrer"
                           className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white text-[9px] font-black uppercase tracking-wider flex items-center gap-1 transition-colors"
                         >
                           <span>Full Size</span>
@@ -533,9 +533,9 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
 
                   {viewingItem.type === "video" && (
                     <div className="w-full">
-                      <video 
-                        src={viewingItem.mediaUrl} 
-                        controls 
+                      <video
+                        src={viewingItem.mediaUrl}
+                        controls
                         className="w-full h-auto max-h-[350px] object-contain bg-black"
                       />
                       <div className="bg-slate-950/80 p-3 flex items-center justify-between border-t border-white/5">
@@ -551,8 +551,8 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
                       {/* PDF embedded iframe viewer */}
                       {viewingItem.fileName?.toLowerCase().endsWith('.pdf') || viewingItem.mediaUrl.includes('blob') ? (
                         <div className="w-full h-[400px]">
-                          <iframe 
-                            src={viewingItem.mediaUrl} 
+                          <iframe
+                            src={viewingItem.mediaUrl}
                             title={viewingItem.title}
                             className="w-full h-full border-0 bg-slate-800"
                           />
@@ -570,10 +570,10 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
                         <span className="text-[10px] text-white/50 font-bold uppercase truncate max-w-[70%]">
                           {viewingItem.fileName || "Document Attachment"}
                         </span>
-                        <a 
-                          href={viewingItem.mediaUrl} 
-                          target="_blank" 
-                          rel="noreferrer" 
+                        <a
+                          href={viewingItem.mediaUrl}
+                          target="_blank"
+                          rel="noreferrer"
                           className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-[9px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-colors"
                         >
                           <span>Open File</span>
@@ -704,10 +704,10 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
                   onDragLeave={handleDrag}
                   onDrop={handleDrop}
                   className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
-                    dragActive 
-                      ? "border-indigo-500 bg-indigo-500/5" 
-                      : fileName 
-                        ? "border-emerald-500/40 bg-emerald-500/5" 
+                    dragActive
+                      ? "border-indigo-500 bg-indigo-500/5"
+                      : fileName
+                        ? "border-emerald-500/40 bg-emerald-500/5"
                         : "border-white/5 hover:border-white/10"
                   }`}
                   onClick={() => fileInputRef.current?.click()}
@@ -719,7 +719,7 @@ export default function RememberMe({ items, onAddItem, onUpdateItem, onDeleteIte
                     onChange={onFileChange}
                     accept="image/*,video/*,application/pdf,.doc,.docx"
                   />
-                  
+
                   {fileName ? (
                     <div className="space-y-1">
                       <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">✓ File Selected</p>

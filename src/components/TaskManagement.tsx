@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { 
-  Search, 
-  Filter, 
-  Plus, 
-  Trash2, 
-  Sparkles, 
-  Clock, 
-  Compass, 
-  AlertOctagon, 
-  BookOpen, 
-  CheckCircle2, 
-  Play, 
+import {
+  Search,
+  Filter,
+  Plus,
+  Trash2,
+  Sparkles,
+  Clock,
+  Compass,
+  AlertOctagon,
+  BookOpen,
+  CheckCircle2,
+  Play,
   AlertCircle,
   X,
   FileText,
@@ -94,7 +94,7 @@ export default function TaskManagement({
     setTitle("");
     setDescription("");
     setDeadline("");
-    setPriority("Medium");
+    setPriority("Normal");
     setCategory("Study");
     setEstimatedDuration("1 hour");
     setDifficulty("Medium");
@@ -116,7 +116,7 @@ export default function TaskManagement({
     });
 
     onUpdateTask(taskId, { subtasks: updatedSubtasks });
-    
+
     // Also update selectedTask if open
     if (selectedTask && selectedTask.id === taskId) {
       setSelectedTask({ ...selectedTask, subtasks: updatedSubtasks });
@@ -125,12 +125,12 @@ export default function TaskManagement({
 
   // Filtered tasks logic
   const filteredTasks = tasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           task.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPriority = priorityFilter === "All" || task.priority === priorityFilter;
     const matchesCategory = categoryFilter === "All" || task.category === categoryFilter;
     const matchesStatus = statusFilter === "All" || task.status === statusFilter;
-    
+
     return matchesSearch && matchesPriority && matchesCategory && matchesStatus;
   });
 
@@ -143,7 +143,7 @@ export default function TaskManagement({
 
   return (
     <div className="space-y-6 text-[#f8fafc]">
-      
+
       {/* Search and Filters Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/5 border border-white/10 p-6 rounded-3xl">
         <div className="flex-1 flex flex-col sm:flex-row gap-4">
@@ -158,7 +158,7 @@ export default function TaskManagement({
               className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white text-xs font-black uppercase tracking-widest focus:outline-none focus:border-indigo-500 transition-all"
             />
           </div>
-          
+
           <div className="flex gap-2 flex-wrap">
             <select
               id="filter-priority"
@@ -200,7 +200,7 @@ export default function TaskManagement({
             </select>
           </div>
         </div>
-        
+
         <button
           id="open-create-task-modal-btn"
           onClick={() => setIsModalOpen(true)}
@@ -233,8 +233,8 @@ export default function TaskManagement({
                     <span className={`px-2 py-0.5 rounded-md text-[9px] font-extrabold font-mono uppercase border ${
                       task.priority === "Very Important"
                         ? "bg-red-500/10 text-red-400 border-red-500/30 animate-pulse"
-                        : task.priority === "Important" 
-                          ? "bg-amber-500/10 text-amber-400 border-amber-500/30" 
+                        : task.priority === "Important"
+                          ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
                           : task.priority === "Normal"
                             ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                             : (task.priority === "Low" || task.priority === "Low Priority")
@@ -268,7 +268,13 @@ export default function TaskManagement({
                   <select
                     id={`task-status-select-${task.id}`}
                     value={task.status}
-                    onChange={(e) => onUpdateTask(task.id, { status: e.target.value as any })}
+                    onChange={(e) => {
+                      const nextStatus = e.target.value as any;
+                      onUpdateTask(task.id, {
+                        status: nextStatus,
+                        completedAt: nextStatus === "Completed" ? new Date().toISOString() : undefined
+                      });
+                    }}
                     className="px-2.5 py-1 bg-slate-950/40 border border-slate-800 rounded-lg text-[10px] font-bold text-slate-400 uppercase tracking-wider cursor-pointer"
                   >
                     <option value="Pending">Pending</option>
@@ -341,7 +347,7 @@ export default function TaskManagement({
               onClick={() => setIsModalOpen(false)}
               className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm"
             />
-            
+
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -540,7 +546,7 @@ export default function TaskManagement({
 
               {/* Tab/Details selection inside detail modal */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+
                 {/* AI Task Breakdown Section */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -548,7 +554,7 @@ export default function TaskManagement({
                       <Sparkles className="w-4 h-4 text-indigo-400" />
                       AI Subtasks & Plan
                     </h3>
-                    
+
                     {selectedTask.difficultyScore && (
                       <span className="text-[10px] font-bold font-mono text-slate-500">
                         Difficulty: <span className="text-indigo-400">{selectedTask.difficultyScore}/10</span>
@@ -564,8 +570,8 @@ export default function TaskManagement({
                   ) : selectedTask.subtasks && selectedTask.subtasks.length > 0 ? (
                     <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1">
                       {selectedTask.subtasks.map((sub) => (
-                        <div 
-                          key={sub.id} 
+                        <div
+                          key={sub.id}
                           className="flex items-start gap-2.5 p-2.5 bg-slate-950/40 rounded-xl border border-slate-850 hover:border-slate-800 transition-colors"
                         >
                           <input
@@ -687,7 +693,7 @@ export default function TaskManagement({
                 </div>
 
               </div>
-              
+
               <div className="pt-2 border-t border-slate-800/60 flex justify-end gap-3">
                 <button
                   id="modal-close-btn"

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { 
-  Plus, 
-  Calendar, 
-  Clock, 
-  Sparkles, 
-  AlertTriangle, 
-  TrendingUp, 
-  Play, 
+import {
+  Plus,
+  Calendar,
+  Clock,
+  Sparkles,
+  AlertTriangle,
+  TrendingUp,
+  Play,
   CheckCircle,
   Activity,
   UserCheck,
@@ -97,7 +97,7 @@ export default function Dashboard({
   const habitStreakSum = habits.reduce((acc, h) => acc + h.streak, 0);
   const completedGoalsCount = goals.filter(g => g.completed).length;
   const productivityScore = Math.min(
-    100, 
+    100,
     Math.round((progressPercentage * 0.5) + (habitStreakSum * 3) + (completedGoalsCount * 10) + 30)
   );
 
@@ -122,8 +122,8 @@ export default function Dashboard({
     }
     const criticalTask = upcomingDeadlines[0] || pendingTasks.find(t => t.priority === "Very Important" || t.priority === "Important");
     if (criticalTask) {
-      const hoursLeft = criticalTask.deadline 
-        ? Math.round((new Date(criticalTask.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60)) 
+      const hoursLeft = criticalTask.deadline
+        ? Math.round((new Date(criticalTask.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60))
         : 0;
       return {
         title: `Beat the Clock: ${criticalTask.title}`,
@@ -155,27 +155,27 @@ export default function Dashboard({
   return (
     <div className="space-y-6 text-[#f8fafc]">
       {/* Top Welcome / Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/5 border border-white/10 p-8 rounded-3xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/5 border border-white/10 p-8 rounded-3xl relative overflow-hidden premium-card-glow shadow-xl">
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 blur-[80px] -mr-32 -mt-32 pointer-events-none" />
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
-              {greeting}, {userName || "Productivity Ninja"}.
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-white premium-gradient-text">
+              {greeting}, {userName || "Executive Core"}.
             </h1>
             {isDemoMode ? (
               <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                🔴 Local Demo Mode
+                🔴 Local Sandbox Mode
               </span>
             ) : (
               <span className="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                🟢 Cloud Synced
+                🟢 Engine Synchronized
               </span>
             )}
           </div>
           <p className="text-xs text-white/40 uppercase tracking-widest font-bold mt-1.5 flex items-center gap-1.5">
             <Calendar className="w-4 h-4 text-indigo-500" />
-            {formattedDate} • Focus Session Ready
+            {formattedDate} • System Status: Peak Performance Active
           </p>
         </div>
         <div>
@@ -185,7 +185,7 @@ export default function Dashboard({
             className="flex items-center gap-2 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-indigo-600/20 hover:scale-[1.02] transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Quick Add Task</span>
+            <span>Schedule Deliverable</span>
           </button>
         </div>
       </div>
@@ -193,15 +193,15 @@ export default function Dashboard({
       {/* Grid: Stats & Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Productivity Score Card */}
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between h-40 relative overflow-hidden group">
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between h-40 relative overflow-hidden group premium-card-glow shadow-md">
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/15 transition-all duration-300 pointer-events-none" />
           <div className="space-y-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400 flex items-center gap-1.5">
               <Activity className="w-3.5 h-3.5" />
-              Focus Score
+              Cognitive Momentum
             </p>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black tracking-tighter">{productivityScore}</span>
+              <span className="text-5xl font-black tracking-tighter">{productivityScore}%</span>
               <span className="text-xs text-green-400 font-bold uppercase tracking-wider ml-1">
                 {productivityScore > 75 ? "+12%" : "+5%"}
               </span>
@@ -209,24 +209,24 @@ export default function Dashboard({
           </div>
           <div className="space-y-2">
             <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-              <div 
-                className="bg-indigo-500 h-full transition-all duration-500" 
+              <div
+                className="bg-indigo-500 h-full transition-all duration-500"
                 style={{ width: `${productivityScore}%` }}
               />
             </div>
             <p className="text-[10px] text-white/40 uppercase tracking-widest font-black">
-              {productivityScore > 75 ? "Flow State Active" : "Building Momentum"}
+              {productivityScore > 75 ? "Deep Flow State Engaged" : "Calibrating Focus Flow"}
             </p>
           </div>
         </div>
 
         {/* Task Progress Card */}
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between h-40 relative overflow-hidden group">
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between h-40 relative overflow-hidden group premium-card-glow shadow-md">
           <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/15 transition-all duration-300 pointer-events-none" />
           <div className="space-y-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-purple-400 flex items-center gap-1.5">
               <CheckCircle className="w-3.5 h-3.5" />
-              Tasks Done
+              Commitment Deliverables
             </p>
             <div className="flex items-baseline gap-1">
               <span className="text-5xl font-black tracking-tighter">{completedTasksCount}</span>
@@ -234,17 +234,17 @@ export default function Dashboard({
             </div>
           </div>
           <p className="text-[10px] text-white/40 uppercase tracking-widest font-black leading-none">
-            {totalTasksCount - completedTasksCount} tasks remaining today
+            {totalTasksCount - completedTasksCount} pending milestones today
           </p>
         </div>
 
         {/* Habit Streaks Sum Card */}
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between h-40 relative overflow-hidden group">
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between h-40 relative overflow-hidden group premium-card-glow shadow-md">
           <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/15 transition-all duration-300 pointer-events-none" />
           <div className="space-y-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-orange-400 flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5" />
-              Streak
+              Habitual Integrity
             </p>
             <div className="flex items-baseline gap-1">
               <span className="text-5xl font-black tracking-tighter">{habitStreakSum}</span>
@@ -252,7 +252,7 @@ export default function Dashboard({
             </div>
           </div>
           <p className="text-[10px] text-white/40 uppercase tracking-widest font-black leading-none">
-            Top 5% this month
+            Top 5% this cohort
           </p>
         </div>
       </div>
@@ -260,7 +260,7 @@ export default function Dashboard({
       {/* Notion-style Activity Heatmap & Completed Index System Tracker */}
       <div className="bg-white/5 border border-white/10 rounded-3xl p-6 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/5 blur-[80px] -mr-32 -mt-32 pointer-events-none" />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
           {/* Left Column: Notion-style Heatmap Grid (e.g. for GATE 2027 Prep & Focus Flow) */}
           <div className="md:col-span-7 space-y-4 border-r border-white/5 pr-0 md:pr-6 flex flex-col justify-between">
@@ -386,8 +386,8 @@ export default function Dashboard({
                   const completedGoalsList = goals.filter(g => (g.completed && g.completedAt?.startsWith(dateString)) || (g.history && g.history.includes(dateString)));
                   const completedHabitsList = habits.filter(h => h.lastCompleted?.startsWith(dateString) || (h.history && h.history.includes(dateString)));
 
-                  const totalItemsCount = matrixType === "tasks" 
-                    ? completedTasksList.length + completedGoalsList.length 
+                  const totalItemsCount = matrixType === "tasks"
+                    ? completedTasksList.length + completedGoalsList.length
                     : completedHabitsList.length;
 
                   const isCompleted = totalItemsCount > 0;
@@ -396,9 +396,9 @@ export default function Dashboard({
                     <div
                       key={`day-${d}`}
                       className={`w-full aspect-square rounded-lg transition-all duration-300 relative group cursor-pointer ${
-                        isToday 
-                          ? "ring-2 ring-indigo-500 bg-indigo-500/80 shadow-md shadow-indigo-500/20" 
-                          : isCompleted 
+                        isToday
+                          ? "ring-2 ring-indigo-500 bg-indigo-500/80 shadow-md shadow-indigo-500/20"
+                          : isCompleted
                             ? matrixType === "tasks"
                               ? "bg-emerald-500 border border-emerald-400/40 shadow-xs shadow-emerald-500/30"
                               : "bg-pink-500 border border-pink-400/40 shadow-xs shadow-pink-500/30"
@@ -468,7 +468,7 @@ export default function Dashboard({
                 for (let w = 0; w < 4; w++) {
                   const weekNumOffset = pastOffset * 4 + w;
                   const mondayOfWeek = new Date(mondayOfCurrentWeek.getTime() - weekNumOffset * 7 * 24 * 60 * 60 * 1000);
-                  
+
                   const daySquares = [];
                   for (let d = 0; d < 7; d++) {
                     const targetDay = new Date(mondayOfWeek.getTime() + d * 24 * 60 * 60 * 1000);
@@ -479,8 +479,8 @@ export default function Dashboard({
                     const completedGoalsList = goals.filter(g => (g.completed && g.completedAt?.startsWith(dateString)) || (g.history && g.history.includes(dateString)));
                     const completedHabitsList = habits.filter(h => h.lastCompleted?.startsWith(dateString) || (h.history && h.history.includes(dateString)));
 
-                    const totalItemsCount = matrixType === "tasks" 
-                      ? completedTasksList.length + completedGoalsList.length 
+                    const totalItemsCount = matrixType === "tasks"
+                      ? completedTasksList.length + completedGoalsList.length
                       : completedHabitsList.length;
 
                     const isCompleted = totalItemsCount > 0;
@@ -489,9 +489,9 @@ export default function Dashboard({
                       <div
                         key={`week-${w}-day-${d}`}
                         className={`flex-1 aspect-square rounded-lg transition-all duration-300 relative group cursor-pointer flex flex-col items-center justify-center border ${
-                          isToday 
-                            ? "ring-2 ring-indigo-500 bg-indigo-500/80 shadow-md shadow-indigo-500/20" 
-                            : isCompleted 
+                          isToday
+                            ? "ring-2 ring-indigo-500 bg-indigo-500/80 shadow-md shadow-indigo-500/20"
+                            : isCompleted
                               ? matrixType === "tasks"
                                 ? "bg-emerald-500 border border-emerald-400/40 shadow-xs shadow-emerald-500/30"
                                 : "bg-pink-500 border border-pink-400/40 shadow-xs shadow-pink-500/30"
@@ -535,10 +535,10 @@ export default function Dashboard({
                     );
                   }
 
-                  const rowLabel = weekNumOffset === 0 
-                    ? "This Week" 
-                    : weekNumOffset === 1 
-                      ? "1 Week Ago" 
+                  const rowLabel = weekNumOffset === 0
+                    ? "This Week"
+                    : weekNumOffset === 1
+                      ? "1 Week Ago"
                       : `${weekNumOffset} Weeks Ago`;
 
                   weekRows.push(
@@ -565,7 +565,7 @@ export default function Dashboard({
                 const today = new Date();
                 const targetYear = today.getFullYear() - pastOffset;
                 const monthsList = [
-                  "January", "February", "March", "April", "May", "June", 
+                  "January", "February", "March", "April", "May", "June",
                   "July", "August", "September", "October", "November", "December"
                 ];
 
@@ -577,34 +577,34 @@ export default function Dashboard({
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 py-1">
                       {monthsList.map((monthName, m) => {
                         const prefix = `${targetYear}-${String(m + 1).padStart(2, "0")}`;
-                        
+
                         const completedTasksList = tasks.filter(t => (t.status === "Completed" && t.completedAt?.startsWith(prefix)) || (t.history && t.history.some(h => h.startsWith(prefix))));
                         const completedGoalsList = goals.filter(g => (g.completed && g.completedAt?.startsWith(prefix)) || (g.history && g.history.some(h => h.startsWith(prefix))));
                         const completedHabitsList = habits.filter(h => h.lastCompleted?.startsWith(prefix) || (h.history && h.history.some(date => date.startsWith(prefix))));
 
-                        const count = matrixType === "tasks" 
-                          ? completedTasksList.length + completedGoalsList.length 
+                        const count = matrixType === "tasks"
+                          ? completedTasksList.length + completedGoalsList.length
                           : completedHabitsList.length;
 
                         let colorClass = "bg-white/5 border border-white/5 hover:border-white/10";
                         if (count > 0) {
                           if (count <= 3) {
-                            colorClass = matrixType === "tasks" 
-                              ? "bg-emerald-950/30 border border-emerald-900/20 hover:border-emerald-700/40" 
+                            colorClass = matrixType === "tasks"
+                              ? "bg-emerald-950/30 border border-emerald-900/20 hover:border-emerald-700/40"
                               : "bg-pink-950/30 border border-pink-900/20 hover:border-pink-700/40";
                           } else if (count <= 8) {
-                            colorClass = matrixType === "tasks" 
-                              ? "bg-emerald-700/50 border border-emerald-600/30 hover:border-emerald-500/40" 
+                            colorClass = matrixType === "tasks"
+                              ? "bg-emerald-700/50 border border-emerald-600/30 hover:border-emerald-500/40"
                               : "bg-pink-700/50 border border-pink-600/30 hover:border-pink-500/40";
                           } else {
-                            colorClass = matrixType === "tasks" 
-                              ? "bg-emerald-500 text-black border-emerald-400" 
+                            colorClass = matrixType === "tasks"
+                              ? "bg-emerald-500 text-black border-emerald-400"
                               : "bg-pink-500 text-white border-pink-400";
                           }
                         }
 
                         return (
-                          <div 
+                          <div
                             key={`year-month-${m}`}
                             className={`p-2 rounded-xl flex flex-col justify-between h-14 relative group cursor-pointer ${colorClass}`}
                           >
@@ -732,14 +732,14 @@ export default function Dashboard({
 
       {/* Main Core Section Split: Left Tasks & AI, Right Schedule */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         {/* Left 8 Cols: Today's Focus & AI Suggestions & Deadlines */}
         <div className="lg:col-span-8 space-y-6">
-          
+
           {/* Today's Focus Task Card */}
           <div className="bg-white/5 border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 blur-[80px] -mr-32 -mt-32 pointer-events-none" />
-            
+
             <div className="flex justify-between items-start mb-6">
               <h2 className="text-3xl font-black uppercase tracking-tighter leading-none text-white">
                 Current Priority<br />
@@ -760,7 +760,7 @@ export default function Dashboard({
                 </div>
               )}
             </div>
-            
+
             {todayFocusTask ? (
               <div className="space-y-6">
                 <p className="text-sm text-white/70 font-medium leading-relaxed">
@@ -819,7 +819,7 @@ export default function Dashboard({
               <AlertTriangle className="w-4 h-4 text-rose-500" />
               Critical Deadlines (Next 48 Hours)
             </h2>
-            
+
             {upcomingDeadlines.length > 0 ? (
               <div className="space-y-3">
                 {upcomingDeadlines.map((t) => {
@@ -837,7 +837,7 @@ export default function Dashboard({
                           <span className="text-rose-400">{hoursLeft} hrs left</span>
                         </div>
                       </div>
-                      
+
                       <button
                         id={`rescue-mode-trigger-${t.id}`}
                         onClick={() => {
@@ -861,11 +861,11 @@ export default function Dashboard({
 
         {/* Right 4 Cols: Gemini Insights & Today's Schedule */}
         <div className="lg:col-span-4 space-y-6">
-          
+
           {/* Gemini Insights Box */}
           <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-600/5 blur-[50px] -mr-16 -mt-16 pointer-events-none" />
-            
+
             <div className="flex items-center gap-2.5 mb-6">
               <div className="w-6 h-6 bg-indigo-500/20 text-indigo-400 rounded flex items-center justify-center">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -880,7 +880,7 @@ export default function Dashboard({
                   Your focus peaks between 10am-12pm. Schedule your key task during this window for 22% better results.
                 </p>
               </div>
-              
+
               <div className="border-l-2 border-purple-500/30 pl-4 py-1">
                 <p className="text-[10px] font-black uppercase tracking-widest text-purple-400 mb-1">Pro suggestion</p>
                 <p className="text-xs font-semibold text-white/70 leading-snug">
@@ -959,10 +959,10 @@ export default function Dashboard({
                           <span className="text-xs font-black uppercase tracking-tight text-white">{slot.activity}</span>
                           <div className="flex items-center gap-1.5">
                             <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${
-                              slot.type === "task" 
-                                ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" 
-                                : slot.type === "routine" 
-                                  ? "bg-white/5 text-white/50" 
+                              slot.type === "task"
+                                ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+                                : slot.type === "routine"
+                                  ? "bg-white/5 text-white/50"
                                   : "bg-white/5 text-white/30"
                             }`}>
                               {slot.type}

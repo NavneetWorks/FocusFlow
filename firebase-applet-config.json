@@ -1,10 +1,10 @@
 {
-  "projectId": "original-approach-0rtgb",
-  "appId": "1:1014530770908:web:1165f62ed037b13979b119",
-  "apiKey": "AIzaSyAK57TKH6TdvXwDs4pLnPVU5YmlSiRWUpM",
-  "authDomain": "original-approach-0rtgb.firebaseapp.com",
+  "projectId": "flowfocus-ai",
+  "appId": "1:853070965991:web:8dac5028f3a508e77a0642",
+  "apiKey": "AIzaSyDzX3TRC-9QGHOuPO8Y6U69JIsadeCBUck",
+  "authDomain": "flowfocus-ai.firebaseapp.com",
   "firestoreDatabaseId": "ai-studio-992ff5f3-7717-415e-9fba-a858f696370d",
-  "storageBucket": "original-approach-0rtgb.firebasestorage.app",
-  "messagingSenderId": "1014530770908",
+  "storageBucket": "flowfocus-ai.firebasestorage.app",
+  "messagingSenderId": "853070965991",
   "measurementId": ""
 }

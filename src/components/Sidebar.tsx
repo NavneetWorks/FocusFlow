@@ -1,18 +1,20 @@
-import { 
-  LayoutDashboard, 
-  CheckSquare, 
-  Bookmark, 
-  Calendar, 
-  Flame, 
-  Target, 
-  MessageSquare, 
-  BarChart3, 
-  User, 
+import {
+  LayoutDashboard,
+  CheckSquare,
+  Bookmark,
+  Calendar,
+  Flame,
+  Target,
+  MessageSquare,
+  BarChart3,
+  User,
   LogOut,
   Menu,
   ChevronLeft,
   CalendarCheck,
-  X
+  X,
+  Share2,
+  Bell
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -27,21 +29,23 @@ interface SidebarProps {
   isMobile?: boolean;
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
+  unreadNotificationsCount?: number;
 }
 
-export default function Sidebar({ 
-  activeTab, 
-  setActiveTab, 
-  collapsed, 
-  setCollapsed, 
-  userEmail, 
+export default function Sidebar({
+  activeTab,
+  setActiveTab,
+  collapsed,
+  setCollapsed,
+  userEmail,
   userName,
   onLogout,
   isMobile = false,
   mobileOpen = false,
-  onCloseMobile
+  onCloseMobile,
+  unreadNotificationsCount = 0
 }: SidebarProps) {
-  
+
   const sections = [
     {
       title: "Productivity",
@@ -53,8 +57,15 @@ export default function Sidebar({
         { id: "habits", label: "Habit Tracker", icon: Flame },
         { id: "goals", label: "Goals Tracker", icon: Target },
         { id: "calendar", label: "Calendar", icon: Calendar },
+        { id: "notifications", label: "Notifications", icon: Bell },
       ]
     },
+    {
+       title: "Accountability",
+       items: [
+         { id: "commitments", label: "Commitments Share", icon: Share2 }
+       ]
+     },
     {
       title: "Intelligence",
       items: [
@@ -71,12 +82,12 @@ export default function Sidebar({
   ];
 
   return (
-    <motion.aside 
+    <motion.aside
       id="sidebar"
       initial={isMobile ? { x: -260 } : { width: "260px" }}
       animate={
-        isMobile 
-          ? { x: mobileOpen ? 0 : -260, width: "260px" } 
+        isMobile
+          ? { x: mobileOpen ? 0 : -260, width: "260px" }
           : { x: 0, width: collapsed ? "76px" : "260px" }
       }
       transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -88,26 +99,26 @@ export default function Sidebar({
         {/* Header / Brand */}
         <div className="h-20 flex items-center justify-between px-6 border-b border-white/5">
           {(!collapsed || isMobile) && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="flex items-center gap-3"
             >
-              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-black text-xl italic text-white shadow-lg shadow-indigo-600/20">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center font-black text-lg italic text-white shadow-lg shadow-indigo-500/20 border border-white/10">
                 F
               </div>
-              <span className="text-xl font-black tracking-tighter uppercase text-white">
-                FocusFlow <span className="text-indigo-400">AI</span>
+              <span className="text-lg font-black tracking-tighter uppercase text-white premium-gradient-text">
+                FocusFlow <span className="text-indigo-400 font-extrabold">AI</span>
               </span>
             </motion.div>
           )}
           {collapsed && !isMobile && (
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-black text-xl italic text-white mx-auto shadow-lg shadow-indigo-600/20">
+            <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl flex items-center justify-center font-black text-lg italic text-white mx-auto shadow-lg shadow-indigo-500/20 border border-white/10">
               F
             </div>
           )}
-          
-          <button 
+
+          <button
             id="toggle-sidebar-btn"
             onClick={() => isMobile ? (onCloseMobile && onCloseMobile()) : setCollapsed(!collapsed)}
             className="p-1.5 rounded-xl hover:bg-white/5 text-white/40 hover:text-white transition-colors cursor-pointer"
@@ -141,13 +152,13 @@ export default function Sidebar({
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 relative group cursor-pointer ${
-                        isActive 
-                          ? "text-indigo-400 bg-indigo-500/10 border border-indigo-500/20" 
+                        isActive
+                          ? "text-indigo-400 bg-indigo-500/10 border border-indigo-500/20"
                           : "hover:bg-white/5 text-white/60 hover:text-white border border-transparent"
                       }`}
                     >
                       {isActive && (
-                        <motion.div 
+                        <motion.div
                           layoutId="activeIndicator"
                           className="absolute inset-y-0 left-0 w-1 bg-indigo-500 rounded-r-full"
                         />
@@ -158,11 +169,22 @@ export default function Sidebar({
                           initial={{ opacity: 0, x: -5 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.2 }}
+                          className="flex-1 text-left"
                         >
                           {item.label}
                         </motion.span>
                       )}
-                      
+
+                      {item.id === "notifications" && unreadNotificationsCount > 0 && (
+                        <span className={`bg-rose-500 text-white text-[9px] font-black rounded-full text-center shrink-0 ${
+                          collapsed && !isMobile
+                            ? "absolute top-1.5 right-1.5 w-3.5 h-3.5 flex items-center justify-center text-[7px]"
+                            : "px-2 py-0.5"
+                        }`}>
+                          {collapsed && !isMobile ? "" : unreadNotificationsCount}
+                        </span>
+                      )}
+
                       {collapsed && !isMobile && (
                         <div className="absolute left-16 scale-0 bg-[#050507] border border-white/10 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all origin-left shadow-lg z-50 pointer-events-none whitespace-nowrap">
                           {item.label}

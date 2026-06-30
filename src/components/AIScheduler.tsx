@@ -1,20 +1,23 @@
 import React, { useState } from "react";
-import { 
-  Clock, 
-  Plus, 
-  Trash2, 
-  Sparkles, 
-  Compass, 
-  RefreshCw, 
-  CalendarDays, 
-  Mic, 
-  MicOff, 
-  Check, 
-  X, 
-  Edit2, 
-  Save, 
-  Volume2, 
-  AlertCircle 
+import {
+  Clock,
+  Plus,
+  Trash2,
+  Sparkles,
+  Compass,
+  RefreshCw,
+  CalendarDays,
+  Mic,
+  MicOff,
+  Check,
+  X,
+  Edit2,
+  Save,
+  Volume2,
+  AlertCircle,
+  Image,
+  UploadCloud,
+  FileImage
 } from "lucide-react";
 import { RoutineEvent, ScheduleSlot, Task, Habit, Goal } from "../types";
 
@@ -71,6 +74,89 @@ export default function AIScheduler({
   const [proposedSchedule, setProposedSchedule] = useState<{ schedule: ScheduleSlot[]; suggestionText: string } | null>(null);
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
+  // AI Input Mode Tab State
+  const [inputMode, setInputMode] = useState<"voice" | "image">("voice");
+
+  // Image Scheduling State
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // base64 representation
+  const [imageFileName, setImageFileName] = useState<string | null>(null);
+  const [imageMimeType, setImageMimeType] = useState<string>("image/png");
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+
+  // Read file and convert to Base64
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setImageError("Invalid file format. Please select an image (PNG, JPEG, WEBP).");
+      return;
+    }
+
+    const maxSizeBytes = 8 * 1024 * 1024; // 8MB
+    if (file.size > maxSizeBytes) {
+      setImageError("Image is too large. Please select an image smaller than 8MB.");
+      return;
+    }
+
+    setImageFileName(file.name);
+    setImageMimeType(file.type);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      // Extract the raw base64 data by splitting off the data URL prefix if it exists
+      const base64Data = result.includes(",") ? result.split(",")[1] : result;
+      setSelectedImage(base64Data);
+    };
+    reader.onerror = () => {
+      setImageError("Failed to read the selected file.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleProcessImagePlan = async () => {
+    if (!selectedImage) return;
+    setIsProcessingImage(true);
+    setProposedSchedule(null);
+    setImageError(null);
+
+    try {
+      const response = await fetch("/api/schedule-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: selectedImage,
+          mimeType: imageMimeType,
+          prompt: imagePrompt.trim() || undefined
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Connection failed to image parsing API");
+      }
+
+      const data = await response.json();
+      setProposedSchedule(data);
+    } catch (err: any) {
+      console.error(err);
+      setImageError(err.message || "Ah, we couldn't process the image. Make sure your Gemini API Key is configured in secrets.");
+    } finally {
+      setIsProcessingImage(false);
+    }
+  };
+
+  const handleClearImage = () => {
+    setSelectedImage(null);
+    setImageFileName(null);
+    setImagePrompt("");
+    setImageError(null);
+  };
+
   // Editing State
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editActivity, setEditActivity] = useState("");
@@ -82,7 +168,7 @@ export default function AIScheduler({
   const handleAddRoutine = (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventName.trim()) return;
-    
+
     onAddRoutineEvent({
       name: eventName,
       start: eventStart,
@@ -97,7 +183,7 @@ export default function AIScheduler({
   };
 
   const toggleRoutineDay = (day: string) => {
-    setRoutineWeekdays(prev => 
+    setRoutineWeekdays(prev =>
       prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
     );
   };
@@ -116,7 +202,7 @@ export default function AIScheduler({
       rec.continuous = false;
       rec.interimResults = false;
       rec.lang = "en-US";
-      
+
       rec.onstart = () => setIsListening(true);
       rec.onend = () => setIsListening(false);
       rec.onresult = (event: any) => {
@@ -138,7 +224,7 @@ export default function AIScheduler({
         }
         setVoiceError(msg);
       };
-      
+
       rec.start();
     } catch (err: any) {
       console.error(err);
@@ -217,10 +303,10 @@ export default function AIScheduler({
 
   return (
     <div className="space-y-6">
-      
+
       {/* Configuration Header Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        
+
         {/* Working Hours settings */}
         <div className="bg-slate-900/40 p-5 rounded-3xl border border-slate-800 space-y-3">
           <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-slate-800">
@@ -308,8 +394,8 @@ export default function AIScheduler({
                       key={day}
                       onClick={() => toggleRoutineDay(day)}
                       className={`w-5 h-5 rounded text-[8px] font-black transition-all flex items-center justify-center border ${
-                        active 
-                          ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/35" 
+                        active
+                          ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/35"
                           : "bg-slate-950/50 text-slate-600 border-slate-900"
                       }`}
                       title={day}
@@ -334,76 +420,200 @@ export default function AIScheduler({
 
       </div>
 
-      {/* NEW SECTION: Voice Scheduling & Speaking */}
+      {/* NEW SECTION: AI Routine Creator Hub (Voice or Image) */}
       <div className="bg-gradient-to-tr from-indigo-950/20 to-purple-950/20 p-6 rounded-3xl border border-indigo-500/10 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Toggle Mode Headers */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-indigo-500/10">
           <div>
             <h3 className="text-sm font-black text-white uppercase tracking-tight flex items-center gap-2">
-              <Mic className="w-5 h-5 text-pink-400 animate-pulse" />
-              Voice-to-Schedule Companion 🌸
+              <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+              AI Multi-Modal Routine Maker 🌸
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">Tell the AI friend your daily plans and routine, and let us block your hours dynamically.</p>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Build your timeline dynamically using standard voice instructions or scan an image/screenshot of your schedule!
+            </p>
           </div>
 
-          <button
-            onClick={startListening}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-2 cursor-pointer transition-all ${
-              isListening 
-                ? "bg-rose-500 hover:bg-rose-600 text-white animate-pulse" 
-                : "bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/20"
-            }`}
-          >
-            {isListening ? (
-              <>
-                <MicOff className="w-4 h-4 text-white" />
-                <span>Stop Listening</span>
-              </>
-            ) : (
-              <>
-                <Mic className="w-4 h-4 text-indigo-400" />
-                <span>Speak Plans</span>
-              </>
-            )}
-          </button>
+          <div className="flex bg-slate-950/60 p-1.5 rounded-2xl border border-slate-800 self-start sm:self-center">
+            <button
+              onClick={() => { setInputMode("voice"); setProposedSchedule(null); }}
+              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+                inputMode === "voice"
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Mic className="w-3.5 h-3.5" />
+              <span>Voice / Text</span>
+            </button>
+            <button
+              onClick={() => { setInputMode("image"); setProposedSchedule(null); }}
+              className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer flex items-center gap-2 ${
+                inputMode === "image"
+                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Image className="w-3.5 h-3.5" />
+              <span>Image Scan</span>
+            </button>
+          </div>
         </div>
 
-        {voiceError && (
-          <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-2xl text-xs flex gap-2 items-start relative animate-fadeIn">
-            <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
-            <div className="flex-1 pr-6">
-              <span className="font-extrabold block">Voice Activation Alert</span>
-              <p className="mt-0.5 text-slate-300 leading-relaxed">{voiceError}</p>
+        {/* 1. Voice Scheduling Mode Pane */}
+        {inputMode === "voice" && (
+          <div className="space-y-4 animate-fadeIn">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Speak or Type plans</span>
+              <button
+                onClick={startListening}
+                className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 cursor-pointer transition-all ${
+                  isListening
+                    ? "bg-rose-500 hover:bg-rose-600 text-white animate-pulse"
+                    : "bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/20"
+                }`}
+              >
+                {isListening ? (
+                  <>
+                    <MicOff className="w-3.5 h-3.5 text-white" />
+                    <span>Stop Listening</span>
+                  </>
+                ) : (
+                  <>
+                    <Mic className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Speak Plans</span>
+                  </>
+                )}
+              </button>
             </div>
-            <button 
-              onClick={() => setVoiceError(null)}
-              className="p-1 hover:bg-rose-500/15 rounded-lg text-rose-400 hover:text-white transition-all cursor-pointer absolute top-3 right-3"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
+
+            {voiceError && (
+              <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-2xl text-xs flex gap-2 items-start relative animate-fadeIn">
+                <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 pr-6">
+                  <span className="font-extrabold block">Voice Activation Alert</span>
+                  <p className="mt-0.5 text-slate-300 leading-relaxed">{voiceError}</p>
+                </div>
+                <button
+                  onClick={() => setVoiceError(null)}
+                  className="p-1 hover:bg-rose-500/15 rounded-lg text-rose-400 hover:text-white transition-all cursor-pointer absolute top-3 right-3"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <textarea
+                value={voiceText}
+                onChange={(e) => setVoiceText(e.target.value)}
+                placeholder="Type or speak out your plan: e.g., 'Today I want to study Calculus for 3 hours, then I have dentist appointment at 3:00pm, and I want a workout in the evening...'"
+                className="w-full h-24 p-4 bg-slate-950/40 border border-slate-800 rounded-2xl text-slate-200 text-xs font-semibold focus:outline-none focus:border-indigo-500/50 transition-all leading-relaxed"
+              />
+
+              <div className="flex justify-end">
+                <button
+                  disabled={!voiceText.trim() || isProcessingVoice}
+                  onClick={handleProcessVoicePlan}
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-600/10 cursor-pointer flex items-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>{isProcessingVoice ? "Processing..." : "Generate Routine"}</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
-        <div className="space-y-3">
-          <textarea
-            value={voiceText}
-            onChange={(e) => setVoiceText(e.target.value)}
-            placeholder="Type or speak out your plan: e.g., 'Today I want to study Calculus for 3 hours, then I have dentist appointment at 3:00pm, and I want a workout in the evening...'"
-            className="w-full h-24 p-4 bg-slate-950/40 border border-slate-800 rounded-2xl text-slate-200 text-xs font-semibold focus:outline-none focus:border-indigo-500/50 transition-all leading-relaxed"
-          />
+        {/* 2. Image Scheduling Mode Pane */}
+        {inputMode === "image" && (
+          <div className="space-y-4 animate-fadeIn">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Scan Routine Screenshot / PDF / Timetable</span>
+            </div>
 
-          <div className="flex justify-end">
-            <button
-              disabled={!voiceText.trim() || isProcessingVoice}
-              onClick={handleProcessVoicePlan}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-600/10 cursor-pointer flex items-center gap-2"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>{isProcessingVoice ? "Processing..." : "Submit"}</span>
-            </button>
+            {imageError && (
+              <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-2xl text-xs flex gap-2 items-start relative animate-fadeIn">
+                <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1 pr-6">
+                  <span className="font-extrabold block">Image Processing Alert</span>
+                  <p className="mt-0.5 text-slate-300 leading-relaxed">{imageError}</p>
+                </div>
+                <button
+                  onClick={() => setImageError(null)}
+                  className="p-1 hover:bg-rose-500/15 rounded-lg text-rose-400 hover:text-white transition-all cursor-pointer absolute top-3 right-3"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Image Uploader & Preview Block */}
+              <div className="flex flex-col items-center justify-center border-2 border-dashed border-indigo-500/20 hover:border-indigo-500/40 bg-slate-950/20 rounded-2xl p-6 transition-all min-h-[160px] relative">
+                {!selectedImage ? (
+                  <label className="flex flex-col items-center justify-center cursor-pointer w-full h-full text-center space-y-2 py-4">
+                    <UploadCloud className="w-8 h-8 text-indigo-400 animate-bounce" />
+                    <span className="text-xs font-black text-slate-300 uppercase tracking-wider">Upload Routine Screenshot</span>
+                    <span className="text-[10px] text-slate-500">PNG, JPEG or WEBP (max 8MB)</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                ) : (
+                  <div className="w-full flex flex-col items-center space-y-3 relative">
+                    <img
+                      src={`data:${imageMimeType};base64,${selectedImage}`}
+                      alt="Selected routine"
+                      className="max-h-36 rounded-lg object-contain border border-white/10"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="flex items-center gap-2 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800">
+                      <FileImage className="w-3.5 h-3.5 text-indigo-400" />
+                      <span className="text-[10px] text-slate-300 font-bold truncate max-w-[150px]">{imageFileName}</span>
+                      <button
+                        onClick={handleClearImage}
+                        className="p-0.5 hover:bg-rose-500/20 text-rose-400 hover:text-white rounded transition-colors"
+                        title="Remove Image"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Guide prompt instructions for image converter */}
+              <div className="flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5 flex-1">
+                  <label className="block text-[10px] uppercase font-mono text-slate-500">Parsing Instructions (Optional)</label>
+                  <textarea
+                    value={imagePrompt}
+                    onChange={(e) => setImagePrompt(e.target.value)}
+                    placeholder="e.g., 'From this timetable image, extract only my lectures for today starting at 9 AM, and add breaks in between...'"
+                    className="w-full h-[100px] p-3 bg-slate-950/40 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold focus:outline-none focus:border-indigo-500/50 transition-all leading-relaxed placeholder:text-slate-700"
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    disabled={!selectedImage || isProcessingImage}
+                    onClick={handleProcessImagePlan}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-600/10 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>{isProcessingImage ? "Analyzing Screenshot..." : "Extract routine"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Display Proposed voice schedule for user acceptance */}
+        {/* Display Proposed voice/image schedule for user acceptance */}
         {proposedSchedule && (
           <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-5 space-y-4 animate-fadeIn">
             <div className="p-3.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20 flex gap-2.5 items-start">
@@ -468,7 +678,7 @@ export default function AIScheduler({
             const totalItemsCount = dayRoutines.length + dayHabits.length + dayGoals.length;
 
             return (
-              <div 
+              <div
                 key={day}
                 className="p-3 bg-slate-950/30 border border-slate-850 rounded-2xl flex flex-col justify-between min-h-[150px] hover:border-indigo-500/30 transition-all group"
               >
@@ -481,7 +691,7 @@ export default function AIScheduler({
                       </span>
                     )}
                   </div>
-                  
+
                   <div className="space-y-1.5 overflow-hidden max-h-[140px] overflow-y-auto pr-0.5 scrollbar-thin">
                     {/* Routines */}
                     {dayRoutines.map((r, idx) => (
@@ -518,12 +728,12 @@ export default function AIScheduler({
 
       {/* Main Core section split: Left Routine list, Right Schedule Output */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Left 1 Col: Routine slot list */}
         <div className="space-y-4">
           <div className="bg-slate-900/40 p-5 rounded-3xl border border-slate-800">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-4">Routine Blockers</h3>
-            
+
             {routineEvents.length > 0 ? (
               <div className="space-y-2.5">
                 {routineEvents.map((evt) => (
@@ -558,8 +768,8 @@ export default function AIScheduler({
                               }
                             }}
                             className={`w-4.5 h-4.5 rounded text-[8px] font-black transition-all flex items-center justify-center border ${
-                              active 
-                                ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/25" 
+                              active
+                                ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/25"
                                 : "bg-slate-950/50 text-slate-600 border-slate-900 hover:border-slate-850"
                             }`}
                             title={`Toggle ${day}`}
@@ -644,13 +854,13 @@ export default function AIScheduler({
                 {schedule.map((slot, index) => {
                   const isEditing = editingIndex === index;
                   return (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className={`p-4 rounded-2xl border relative pl-5 flex flex-col gap-3 transition-all ${
-                        slot.type === "task" 
-                          ? "bg-indigo-950/10 border-indigo-500/25" 
-                          : slot.type === "routine" 
-                            ? "bg-slate-950/40 border-slate-850" 
+                        slot.type === "task"
+                          ? "bg-indigo-950/10 border-indigo-500/25"
+                          : slot.type === "routine"
+                            ? "bg-slate-950/40 border-slate-850"
                             : "bg-slate-950/20 border-slate-900 text-slate-500"
                       } ${isEditing ? "ring-2 ring-indigo-500 border-transparent bg-slate-900/80" : ""}`}
                     >
