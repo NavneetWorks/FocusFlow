@@ -11,6 +11,8 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+export default app;
+
 // ==========================================
 // SECURITY MIDDLEWARES & OWASP BEST PRACTICES
 // ==========================================
@@ -1118,6 +1120,10 @@ async function initializeServer() {
   });
 }
 
-initializeServer().catch(err => {
-  console.error("Failed to spin up FocusFlow server:", err);
-});
+// Vercel imports the Express app as a serverless function. Starting a listener
+// there would keep the invocation open and prevent the function from serving.
+if (!process.env.VERCEL) {
+  initializeServer().catch(err => {
+    console.error("Failed to spin up FocusFlow server:", err);
+  });
+}
