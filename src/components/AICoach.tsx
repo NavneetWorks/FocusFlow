@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageSquare, Send, Sparkles, HelpCircle, User, Brain, AlertCircle } from "lucide-react";
 import { ChatMessage, Task } from "../types";
+import { generateGeminiTextFromBrowser } from "../utils/geminiBrowser";
 
 interface AICoachProps {
   tasks: Task[];
@@ -48,25 +49,22 @@ export default function AICoach({ tasks }: AICoachProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/coach", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [...messages, userMsg],
-          currentTasks: tasks.map(t => ({ title: t.title, deadline: t.deadline, priority: t.priority, status: t.status }))
-        })
-      });
+      const taskContext = tasks
+        .map(t => `- ${t.title} | priority: ${t.priority} | status: ${t.status} | deadline: ${t.deadline || "none"}`)
+        .join("\n");
 
-      if (!response.ok) {
-        throw new Error("Failed to contact your productivity coach");
-      }
+      const chatContext = [...messages, userMsg]
+        .slice(-12)
+        .map(m => `${m.sender === "ai" ? "Coach" : "User"}: ${m.text}`)
+        .join("\n");
 
-      const data = await response.json();
+      const prompt = `You are FocusFlow AI Productivity Coach.\nKeep responses practical, warm, and concise.\nUse markdown bullets when helpful.\n\nCurrent task list:\n${taskContext || "No tasks yet."}\n\nConversation:\n${chatContext}\n\nNow respond to the latest user message with actionable coaching.`;
+      const text = await generateGeminiTextFromBrowser(prompt);
       
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: "ai",
-        text: data.text || "I apologize, my performance synapse hiccuped. Let's try that prompt again!",
+        text: text || "I apologize, my performance synapse hiccuped. Let's try that prompt again!",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -76,7 +74,7 @@ export default function AICoach({ tasks }: AICoachProps) {
       const errorMsg: ChatMessage = {
         id: `err-${Date.now()}`,
         sender: "ai",
-        text: "🚨 SYNAPSE OFFLINE: I couldn't connect to Gemini. Please check if your GEMINI_API_KEY is configured correctly in the secrets menu!",
+        text: "🚨 SYNAPSE OFFLINE: I couldn't connect to Gemini. Set GEMINI_API_KEY in your frontend environment and redeploy.",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, errorMsg]);

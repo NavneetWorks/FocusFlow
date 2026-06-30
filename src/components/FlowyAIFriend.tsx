@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { MessageSquare, X, Send, Sparkles, Smile, Volume2, Heart, ShieldAlert, Award } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChatMessage, Task } from "../types";
+import { generateGeminiTextFromBrowser } from "../utils/geminiBrowser";
 
 interface FlowyAIFriendProps {
   tasks: Task[];
@@ -67,26 +68,17 @@ export default function FlowyAIFriend({ tasks, userName }: FlowyAIFriendProps) {
         Keep your replies warm, relatively short, punchy, and incredibly caring, like a text message from a close sibling or friend.
       `;
 
-      const response = await fetch("/api/coach", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: [
-            { sender: "user", text: `[SYSTEM INSTRUCTION] ${systemPrompt}` },
-            ...messages.filter(m => m.id !== "welcome"),
-            userMsg
-          ],
-          currentTasks: tasks
-        })
-      });
+      const chatContext = [...messages.filter(m => m.id !== "welcome"), userMsg]
+        .slice(-10)
+        .map(m => `${m.sender === "ai" ? "Flowy" : "User"}: ${m.text}`)
+        .join("\n");
 
-      if (!response.ok) throw new Error("Connection glitch");
-
-      const data = await response.json();
+      const prompt = `${systemPrompt}\n\nConversation so far:\n${chatContext}\n\nRespond as Flowy now.`;
+      const textResponse = await generateGeminiTextFromBrowser(prompt);
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: "ai",
-        text: data.text || "Oops! I had a little hiccup, but I'm back. Tell me what's on your mind! 💖",
+        text: textResponse || "Oops! I had a little hiccup, but I'm back. Tell me what's on your mind! 💖",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -96,7 +88,7 @@ export default function FlowyAIFriend({ tasks, userName }: FlowyAIFriendProps) {
       const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: "ai",
-        text: "Oh no! My signal is fading a bit. Make sure your Gemini API Key is entered so we can keep talking! 💖",
+        text: "Oh no! My signal is fading a bit. Set GEMINI_API_KEY in frontend env so we can keep talking! 💖",
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
       setMessages(prev => [...prev, aiMsg]);
