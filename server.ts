@@ -2,8 +2,7 @@ import express from "express";
 import path from "path";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
-import { createServer as createViteServer } from "vite";
-import nodemailer from "nodemailer";
+
 
 // Load environment variables
 dotenv.config();
@@ -134,61 +133,9 @@ app.use("/api/", (req, res, next) => {
   next();
 });
 
-// Helper to send email to developer
+// Email delivery is disabled (nodemailer not available on Vercel serverless)
 async function sendDeveloperEmail(subject: string, htmlContent: string, targetEmailOverride?: string) {
-  const host = process.env.SMTP_HOST;
-  const port = process.env.SMTP_PORT;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const developerEmail = targetEmailOverride || process.env.DEVELOPER_EMAIL || "developer@example.com";
-
-  console.log(`[SMTP Mail Queue] Attempting to dispatch email to: ${developerEmail}`);
-  console.log(`[SMTP Mail Queue] Subject: ${subject}`);
-
-  if (!host || !user || !pass) {
-    console.warn("[SMTP Mail Queue] SMTP credentials are not fully configured. Email was simulated and logged to the server console.");
-    return {
-      success: false,
-      simulated: true,
-      message: "SMTP configuration missing in server environment. Simulated email printed to logs.",
-      recipient: developerEmail
-    };
-  }
-
-  try {
-    const transporter = nodemailer.createTransport({
-      host: host,
-      port: parseInt(port || "587"),
-      secure: port === "465", // true for 465, false for other ports
-      auth: {
-        user: user,
-        pass: pass,
-      },
-    });
-
-    const info = await transporter.sendMail({
-      from: `"FocusFlow AI Gateway" <${user}>`,
-      to: developerEmail,
-      subject: subject,
-      html: htmlContent,
-    });
-
-    console.log(`[SMTP Mail Queue] Email sent successfully! MessageID: ${info.messageId}`);
-    return {
-      success: true,
-      simulated: false,
-      messageId: info.messageId,
-      recipient: developerEmail
-    };
-  } catch (error: any) {
-    console.error(`[SMTP Mail Queue] Failed to deliver real email over SMTP:`, error);
-    return {
-      success: false,
-      simulated: false,
-      error: error.message || error,
-      recipient: developerEmail
-    };
-  }
+  return { success: false, simulated: true, message: "Email delivery not available in serverless environment." };
 }
 
 // Enable JSON parser for incoming requests with a larger limit for image uploads
@@ -1102,6 +1049,7 @@ app.post("/api/send-test-email", async (req, res) => {
 
 async function initializeServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
