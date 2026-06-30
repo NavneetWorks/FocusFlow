@@ -1,0 +1,6 @@
+{
+  "name": "FocusFlow AI",
+  "description": "An AI-powered productivity companion that proactively assists users in planning, prioritizing, and completing tasks before deadlines are missed. The solution moves beyond traditional reminders and focuses on helping users take meaningful action.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
