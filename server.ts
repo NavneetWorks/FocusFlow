@@ -147,9 +147,14 @@ let aiClient: GoogleGenAI | null = null;
 
 function getGeminiClient(): GoogleGenAI {
   if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      process.env.GOOGLE_GENAI_API_KEY;
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not configured in the environment variables.");
+      throw new Error(
+        "Missing Gemini API key. Set GEMINI_API_KEY (or GOOGLE_API_KEY / GOOGLE_GENAI_API_KEY) in deployment environment variables."
+      );
     }
     aiClient = new GoogleGenAI({ apiKey });
   }
