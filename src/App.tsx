@@ -1815,8 +1815,8 @@ export default function App() {
         <div className="w-full max-w-5xl relative z-10">
           <CommitmentsShare
             sharedId={sharedCommitmentId}
-            userId={user ? user.uid : (isDemoMode ? "demo_user" : "demo_user")}
-            userEmail={user ? user.email || "" : (isDemoMode ? demoEmail : "anonymous@focusflow.ai")}
+            userId="demo_user"
+            userEmail="anonymous@focusflow.ai"
             userName={profile ? profile.name : "Productivity Buddy"}
             userProfilePic={profile ? profile.profilePic : ""}
             rememberMeItems={rememberMeItems}
