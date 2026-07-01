@@ -8,6 +8,7 @@ interface FlowyAIFriendProps {
   tasks: Task[];
   userName: string;
 }
+//hii
 
 export default function FlowyAIFriend({ tasks, userName }: FlowyAIFriendProps) {
   const [isOpen, setIsOpen] = useState(false);
